@@ -1,10 +1,25 @@
+/**
+ * create by Jocs 2016.09.19
+ */
+
+import {
+	handlerThen,
+	resolveProvider,
+	rejectProvider,
+	noop,
+	delay,
+	range,
+	isThenable,
+	isPromise
+} from './utils'
+
 class APromise {
 	constructor(exector) {
 		this.status = 'pending'
 		this.successListeners = []
 		this.failureListeners = []
 
-		exector(data => resolve(this, data), err => reject(this, err))
+		delay(() => exector(resolveProvider(this), rejectProvider(this)))
 	}
 	// prototype method
 	then(...args) {
@@ -21,11 +36,12 @@ class APromise {
 }
 
 APromise.resolve = data => {
-	return data.then && typeof data.then === 'function' ? data : new APromise((resolve, reject) => delay(() => resolve(data), 0))
+	if (isPromise(data)) return data
+	return isThenable(data) ? new APromise(data.then) : new APromise((resolve, reject) => resolve(data))
 }
-APromise.reject = err => {
-	return new APromise((resolve, reject) => delay(() => reject(err), 0))
-}
+
+APromise.reject = err =>  new APromise((resolve, reject) => reject(err))
+
 APromise.all = promises => {
 	const length = promises.length
 	const result = new APromise(noop)
@@ -36,62 +52,18 @@ APromise.all = promises => {
 		p.then(data => {
 			values[i] = data
 			count++
-			if (count === length) resolve(result, values)
-		}, err => {
-			reject(result, err)
-		})
+			if (count === length) resolveProvider(result)(values)
+		}, rejectProvider(result))
 	})
 	return result
 }
 APromise.race = promises => {
 	const result = new APromise(noop)
 	promises.forEach((p, i) => {
-		p.then(data => resolve(result, data), err => reject(result, err))
+		p.then(resolveProvider(result), rejectProvider(result))
 	})
 	return result
 }
-// handleThen
-function handlerThen(parent, child, arg, type) {
-	const listeners = type === 0 ? 'successListeners' : 'failureListeners'
-	if (typeof arg === 'function') {
-		const handler = function(data) {
-			const result = arg(data)
+window.Promise = APromise
+export default APromise
 
-			if (result && result.then && typeof result.then === 'function') {
-				child = Object.assign(result, child)
-			} else {
-				resolve(child, result)
-			}
-
-		}
-		parent[listeners].push(handler)
-	} else if (!arg) {
-		const handler = function(data) {
-			type === 0 ? resolve(child, data): reject(child, data)
-		}
-		parent[listeners].push(handler)
-	}
-}
-
-// resolve function
-function resolve(promise, data) {
-	if (promise.status !== 'pending') return false
-	promise.status = 'fulfilled'
-	promise.successListeners.forEach(fn => fn(data))
-}
-// reject function
-function reject(promise, err) {
-	if (promise.status !== 'pending') return false
-	promise.status = 'rejected'
-	promise.failureListeners.forEach(fn => fn(err))
-}
-
-function noop() {}
-
-function delay(fn, time) {
-	setTimeout(() => fn(), time)
-}
-
-function range(n) {
-	return n === 0 ? [] : [n, ...range(n - 1)]
-}
