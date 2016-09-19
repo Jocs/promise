@@ -4,12 +4,13 @@
 
 import {
 	handlerThen,
-	resolve,
-	reject,
+	resolveProvider,
+	rejectProvider,
 	noop,
 	delay,
 	range,
-	isThenable
+	isThenable,
+	isPromise
 } from './utils'
 
 class APromise {
@@ -18,7 +19,7 @@ class APromise {
 		this.successListeners = []
 		this.failureListeners = []
 
-		exector(data => resolve(this, data), err => reject(this, err))
+		delay(() => exector(resolveProvider(this), rejectProvider(this)))
 	}
 	// prototype method
 	then(...args) {
@@ -35,11 +36,12 @@ class APromise {
 }
 
 APromise.resolve = data => {
-	return isThenable(data) ? data : new APromise((resolve, reject) => delay(() => resolve(data), 0))
+	if (isPromise(data)) return data
+	return isThenable(data) ? new APromise(data.then) : new APromise((resolve, reject) => resolve(data))
 }
-APromise.reject = err => {
-	return new APromise((resolve, reject) => delay(() => reject(err), 0))
-}
+
+APromise.reject = err =>  new APromise((resolve, reject) => reject(err))
+
 APromise.all = promises => {
 	const length = promises.length
 	const result = new APromise(noop)
@@ -50,20 +52,18 @@ APromise.all = promises => {
 		p.then(data => {
 			values[i] = data
 			count++
-			if (count === length) resolve(result, values)
-		}, err => {
-			reject(result, err)
-		})
+			if (count === length) resolveProvider(result)(values)
+		}, rejectProvider(result))
 	})
 	return result
 }
 APromise.race = promises => {
 	const result = new APromise(noop)
 	promises.forEach((p, i) => {
-		p.then(data => resolve(result, data), err => reject(result, err))
+		p.then(resolveProvider(result), rejectProvider(result))
 	})
 	return result
 }
-
+window.Promise = APromise
 export default APromise
 
