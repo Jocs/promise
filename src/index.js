@@ -19,7 +19,13 @@ class APromise {
 		this.successListeners = []
 		this.failureListeners = []
 
-		delay(() => exector(resolveProvider(this), rejectProvider(this)))
+		delay(() => {
+			try {
+				exector(resolveProvider(this), rejectProvider(this))
+			} catch(err) {
+				rejectProvider(this)(err)
+			}
+		})
 	}
 	// prototype method
 	then(...args) {
