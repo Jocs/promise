@@ -4,28 +4,30 @@
 
 import {
 	handlerThen,
-	resolveProvider,
-	rejectProvider,
+	executorProvider,
 	noop,
-	delay,
 	range,
 	isThenable,
 	isPromise
 } from './utils'
+
+import {
+	RESOLVE,
+	REJECT
+} from './constants'
 
 class APromise {
 	constructor(exector) {
 		this.status = 'pending'
 		this.successListeners = []
 		this.failureListeners = []
+		this.result = undefined
 
-		delay(() => {
-			try {
-				exector(resolveProvider(this), rejectProvider(this))
-			} catch(err) {
-				rejectProvider(this)(err)
-			}
-		})
+		try {
+			exector(executorProvider(this, RESOLVE),  executorProvider(this, REJECT))
+		} catch(err) {
+			executorProvider(this, REJECT)(err)
+		}
 	}
 	// prototype method
 	then(...args) {
@@ -58,15 +60,15 @@ APromise.all = promises => {
 		p.then(data => {
 			values[i] = data
 			count++
-			if (count === length) resolveProvider(result)(values)
-		}, rejectProvider(result))
+			if (count === length) executorProvider(result, RESOLVE)(values)
+		}, executorProvider(result, REJECT))
 	})
 	return result
 }
 APromise.race = promises => {
 	const result = new APromise(noop)
 	promises.forEach((p, i) => {
-		p.then(resolveProvider(result), rejectProvider(result))
+		p.then(executorProvider(result, RESOLVE), executorProvider(result, REJECT))
 	})
 	return result
 }
