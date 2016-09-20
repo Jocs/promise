@@ -11,6 +11,15 @@ export const isThenable = data => data && data.then && typeof data.then === 'fun
 export const isPromise = object => isThenable(object) && ('catch' in object) && typeof object.catch === 'function'
 // export const delay = (fn, time = 0) => setTimeout(() => fn(), time)
 
+// resolve function
+export const executorProvider = (promise, type) => data => {
+	if (promise.status !== 'pending') return false
+	const listenerType = type === RESOLVE ? 'successListeners' : 'failureListeners'
+	promise.status = type === RESOLVE ? 'fulfilled' : 'rejected'
+	promise.result = data
+	promise[listenerType].forEach(fn => fn(data))
+}
+
 // handleThen
 export const handlerThen = (parent, child, arg, type) => {
 	const listeners = type === 0 ? 'successListeners' : 'failureListeners'
@@ -31,17 +40,7 @@ export const handlerThen = (parent, child, arg, type) => {
 		}		
 	}
 	if(parent.status === 'pending') parent[listeners].push(handler)
-	else if(parent.status === 'fulfilled') handler(parent.result)
-	else if(parent.status === 'rejected') handler(parent.result)
-}
-
-// resolve function
-export const executorProvider = (promise, type) => data => {
-	if (promise.status !== 'pending') return false
-	const listenerType = type === RESOLVE ? 'successListeners' : 'failureListeners'
-	promise.status = type === RESOLVE ? 'fulfilled' : 'rejected'
-	promise.result = data
-	promise[listenerType].forEach(fn => fn(data))
+	else handler(parent.result)
 }
 
 export const noop = () => {}
