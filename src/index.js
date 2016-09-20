@@ -17,14 +17,14 @@ import {
 } from './constants'
 
 class APromise {
-	constructor(exector) {
+	constructor(executor) {
 		this.status = 'pending'
 		this.successListeners = []
 		this.failureListeners = []
 		this.result = undefined
 
 		try {
-			exector(executorProvider(this, RESOLVE),  executorProvider(this, REJECT))
+			executor(executorProvider(this, RESOLVE),  executorProvider(this, REJECT))
 		} catch(err) {
 			executorProvider(this, REJECT)(err)
 		}
