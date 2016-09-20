@@ -8,7 +8,8 @@ import {
 	noop,
 	range,
 	isThenable,
-	isPromise
+	isPromise,
+	fill
 } from './utils'
 
 import {
@@ -32,9 +33,9 @@ class APromise {
 	// prototype method
 	then(...args) {
 		let child = new this.constructor(noop)
-		args.length === 1 && args.push(undefined)
+		const handledArgs = fill(args, 2)
 		// 处理successFunction
-		args.forEach((arg, i) => handlerThen(this, child, arg, i))
+		handledArgs.forEach((arg, i) => handlerThen(this, child, arg, i))
 
 		return child
 	}
