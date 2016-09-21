@@ -19,6 +19,7 @@ import {
 
 class APromise {
 	constructor(executor) {
+		if (typeof executor !== 'function') throw new TypeError('Promise constructor need a function as parameter')
 		this.status = 'pending'
 		this.successListeners = []
 		this.failureListeners = []
@@ -73,6 +74,6 @@ APromise.race = promises => {
 	})
 	return result
 }
-window.Promise = APromise
+
 export default APromise
 

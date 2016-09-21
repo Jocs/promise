@@ -20,13 +20,13 @@ export const executorProvider = (promise, type) => data => {
 	const listenerType = type === RESOLVE ? 'successListeners' : 'failureListeners'
 	promise.status = type === RESOLVE ? 'fulfilled' : 'rejected'
 	promise.result = data
-	promise[listenerType].forEach(fn => fn(promise.status, data))
+	promise[listenerType].forEach(fn => fn(data))
 }
 
 // handleThen
 export const handlerThen = (parent, child, arg, type) => {
 	const listeners = type === 0 ? 'successListeners' : 'failureListeners'
-	const handler = (status, data) => {
+	const handler = data => {
 		if (typeof arg === 'function') {
 			let result
 			try {
@@ -35,16 +35,16 @@ export const handlerThen = (parent, child, arg, type) => {
 				return executorProvider(child, REJECT)(err)
 			}
 			if (isThenable(result)) {
-				child = Object.assign(result, child)
+				isPromise(result) ? Object.assign(child, result) : Object.assign(child, new parent.constructor(result.then))
 			} else {
 				executorProvider(child, RESOLVE)(result)
 			}
 		} else if (!arg) {
 			const actionType = type === 0 ? RESOLVE : REJECT
-			if ((status === 'fulfilled' && type === 0) || (status === 'rejected' && type === 1))
-				executorProvider(child, actionType)(data)
+			executorProvider(child, actionType)(data)
 		}
 	}
 	if(parent.status === 'pending') parent[listeners].push(handler)
-	else handler(parent.status, parent.result)
+	else if ((parent.status === 'fulfilled' && type === 0) || (parent.status === 'rejected' && type === 1)) 
+		handler(parent.result)
 }

@@ -1,7 +1,7 @@
 const webpack = require('webpack')
 module.exports = {
     devtool: 'source-map',
-    entry: './src/index.js',
+    entry: './src/forPackage.js',
     output: {
         path: './dist',
         filename: 'promise.min.js'
