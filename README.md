@@ -1,3 +1,4 @@
+https://travis-ci.org/Jocs/promise.svg?branch=master
 #### ES2015系列--Build your own Promise
 
 ##### 一、JavaScript异步编程背景
