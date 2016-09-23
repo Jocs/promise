@@ -4,7 +4,8 @@
   "description": "polyfill Promise",
   "main": "index.js",
   "scripts": {
-    "test": "eslint src",
+    "test": "karma start",
+    "lint": "eslint src",
     "clean": "rimraf dist",
     "build": "npm run clean && webpack"
   },
@@ -21,6 +22,11 @@
     "eslint": "^3.5.0",
     "eslint-plugin-promise": "^2.0.1",
     "eslint-plugin-standard": "^2.0.0",
+    "jasmine-core": "^2.5.2",
+    "karma": "^1.3.0",
+    "karma-chrome-launcher": "^2.0.0",
+    "karma-jasmine": "^1.0.2",
+    "karma-webpack": "^1.8.0",
     "rimraf": "^2.5.4",
     "webpack": "^1.13.2"
   }
