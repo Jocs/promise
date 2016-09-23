@@ -1,4 +1,5 @@
-![](https://travis-ci.org/Jocs/promise.svg?branch=master)[![codecov](https://codecov.io/gh/Jocs/promise/branch/master/graph/badge.svg)](https://codecov.io/gh/Jocs/promise)
+[![Build Status](https://travis-ci.org/Jocs/promise.svg?branch=master)](https://travis-ci.org/Jocs/promise)
+[![codecov](https://codecov.io/gh/Jocs/promise/branch/master/graph/badge.svg)](https://codecov.io/gh/Jocs/promise)
 
 #### ES2015系列--Build your own Promise
 
