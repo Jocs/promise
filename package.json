@@ -4,7 +4,7 @@
   "description": "polyfill Promise",
   "main": "index.js",
   "scripts": {
-    "lint": "eslint src",
+    "test": "eslint src",
     "clean": "rimraf dist",
     "build": "npm run clean && webpack"
   },
