@@ -8,15 +8,21 @@ module.exports = config => {
             'test/**/*.spec.js'
         ],
         preprocessors: {
-            'src/index.js': 'coverage',
-            'test/**/*.spec.js': ['webpack']
+            'test/**/*.spec.js': ['webpack'],
+            'src/index.js': 'coverage'
         },
         reporters: ['progress', 'coverage'],
         coverageReporter: {
-            reporters: [
-                {type: 'lcov', dir: '.test/coverage', subdir: '.'},
-                {type: 'text-summary', dir: '.test/coverage', subdir: '.'}
-            ]
+            reporters: [{
+                type:'text-summary'
+            }, {
+                type: 'html',
+                dir: 'test/coverage'
+            }, {
+                type: 'cobertura',
+                subdir: '.',
+                dir: 'test/coverage'
+            }]
         },
         plugins: [
             'karma-jasmine',
