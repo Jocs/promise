@@ -20,8 +20,9 @@ const statusProvider = (promise, status) => data => {
 
 class APromise {
 	constructor(executor) {
-		if (typeof executor !== 'function') 
+		if (typeof executor !== 'function') {
 			throw new TypeError('Promise constructor need a function as parameter')
+		}
 		this.status = PENDING
 		this.listeners = {
 			FULFILLED: [],
@@ -30,8 +31,8 @@ class APromise {
 		this.result = undefined
 
 		try {
-			executor(statusProvider(this, FULFILLED),  statusProvider(this, REJECTED))
-		} catch(e) {
+			executor(statusProvider(this, FULFILLED), statusProvider(this, REJECTED))
+		} catch (e) {
 			statusProvider(this, REJECTED)(e)
 		}
 	}
@@ -50,8 +51,8 @@ class APromise {
 					}
 				} catch (e) {
 					statusProvider(child, REJECTED)(e)
-				}	
-			} else if(!fn) {
+				}
+			} else if (!fn) {
 				statusProvider(child, this.status)(data)
 			}
 		}
@@ -82,7 +83,7 @@ APromise.resolve = data => {
 	return isThenable(data) ? new APromise(data.then) : new APromise((resolve, reject) => resolve(data))
 }
 
-APromise.reject = err =>  new APromise((resolve, reject) => reject(err))
+APromise.reject = err => new APromise((resolve, reject) => reject(err))
 
 APromise.all = promises => {
 	const length = promises.length
