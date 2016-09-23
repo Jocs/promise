@@ -1,43 +1,75 @@
 /**
  * create by Jocs 2016.09.19
  */
+const PENDING = 'PENDING' // Promise 的 初始状态
+const FULFILLED = 'FULFILLED' // Promise 成功返回后的状态
+const REJECTED = 'REJECTED' // Promise 失败后的状态
 
-import {
-	handlerThen,
-	executorProvider,
-	noop,
-	range,
-	isThenable,
-	isPromise,
-	fill
-} from './utils'
+const isThenable = data => data && data.then && typeof data.then === 'function'
+const isPromise = object => isThenable(object) && ('catch' in object) && typeof object.catch === 'function'
+const noop = () => {}
+const range = n => n === 0 ? [] : [n, ...range(n - 1)]
 
-import {
-	RESOLVE,
-	REJECT
-} from './constants'
+// resolve function
+const statusProvider = (promise, status) => data => {
+	if (promise.status !== PENDING) return false
+	promise.status = status
+	promise.result = data
+	promise.listeners[status].forEach(fn => fn(data))
+}
 
 class APromise {
 	constructor(executor) {
-		if (typeof executor !== 'function') throw new TypeError('Promise constructor need a function as parameter')
-		this.status = 'pending'
-		this.successListeners = []
-		this.failureListeners = []
+		if (typeof executor !== 'function') 
+			throw new TypeError('Promise constructor need a function as parameter')
+		this.status = PENDING
+		this.listeners = {
+			FULFILLED: [],
+			REJECTED: []
+		}
 		this.result = undefined
 
 		try {
-			executor(executorProvider(this, RESOLVE),  executorProvider(this, REJECT))
-		} catch(err) {
-			executorProvider(this, REJECT)(err)
+			executor(statusProvider(this, FULFILLED),  statusProvider(this, REJECTED))
+		} catch(e) {
+			statusProvider(this, REJECTED)(e)
 		}
 	}
 	// prototype method
 	then(...args) {
-		let child = new this.constructor(noop)
-		const handledArgs = fill(args, 2)
-		// 处理successFunction
-		handledArgs.forEach((arg, i) => handlerThen(this, child, arg, i))
+		const child = new this.constructor(noop)
 
+		const handler = fn => data => {
+			if (typeof fn === 'function') {
+				try {
+					const result = fn(data)
+					if (isThenable(result)) {
+						isPromise(result) ? Object.assign(child, result) : Object.assign(child, new this.constructor(result.then))
+					} else {
+						statusProvider(child, FULFILLED)(result)
+					}
+				} catch (e) {
+					statusProvider(child, REJECTED)(e)
+				}	
+			} else if(!fn) {
+				statusProvider(child, this.status)(data)
+			}
+		}
+		switch (this.status) {
+			case PENDING: {
+				this.listeners[FULFILLED].push(handler(args[0]))
+				this.listeners[REJECTED].push(handler(args[1]))
+				break
+			}
+			case FULFILLED: {
+				handler(args[0])(this.result)
+				break
+			}
+			case REJECTED: {
+				handler(args[1])(this.result)
+				break
+			}
+		}
 		return child
 	}
 	catch(arg) {
@@ -62,18 +94,17 @@ APromise.all = promises => {
 		p.then(data => {
 			values[i] = data
 			count++
-			if (count === length) executorProvider(result, RESOLVE)(values)
-		}, executorProvider(result, REJECT))
+			if (count === length) statusProvider(result, FULFILLED)(values)
+		}, statusProvider(result, REJECTED))
 	})
 	return result
 }
 APromise.race = promises => {
 	const result = new APromise(noop)
 	promises.forEach((p, i) => {
-		p.then(executorProvider(result, RESOLVE), executorProvider(result, REJECT))
+		p.then(statusProvider(result, FULFILLED), statusProvider(result, REJECTED))
 	})
 	return result
 }
 
 export default APromise
-
