@@ -6,5 +6,4 @@ cache:
     - node_modules
 script:
   - npm test
-after_success:
-  - bash <(curl -s https://codecov.io/bash)
+  - cat ./test/coverage/lcov.info | ./node_modules/.bin/codecov
