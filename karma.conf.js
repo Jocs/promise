@@ -11,20 +11,12 @@ module.exports = config => {
             'src/index.js': 'coverage',
             'test/**/*.spec.js': ['webpack']
         },
-        reporters: ['progress', 'coverage', 'verbose'],
-        // 测试结果报告的类型
-        coverageReporter:{
-            reporters: [{
-                type:'text-summary'
-            }, {
-                type: 'html',
-                dir: 'test/coverage'
-            }, {
-                // 这就是Codecov支持的文件类型
-                type: 'cobertura',
-                subdir: '.',
-                dir: 'test/coverage'
-            }]
+        reporters: ['progress', 'coverage'],
+        coverageReporter: {
+            reporters: [
+                {type: 'lcov', dir: '.test/coverage', subdir: '.'},
+                {type: 'text-summary', dir: '.test/coverage', subdir: '.'}
+            ]
         },
         plugins: [
             'karma-jasmine',
