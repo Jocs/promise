@@ -3,7 +3,27 @@ module.exports = config => {
         basePath: __dirname,
         singleRun: true,
         frameworks: ['jasmine'],
-        browsers: ['Chrome'], // PhantomJs 有可能不支持Promise，所以还是使用Chrome了
+        browsers: ['PhantomJS', 'PhantomJS_custom'],
+
+        // you can define custom flags
+        customLaunchers: {
+          'PhantomJS_custom': {
+            base: 'PhantomJS',
+            options: {
+              windowName: 'my-window',
+              settings: {
+                webSecurityEnabled: false
+              },
+            },
+            flags: ['--load-images=true'],
+            debug: true
+          }
+        },
+
+        phantomjsLauncher: {
+          // Have phantomjs exit if a ResourceError is encountered (useful if karma exits without killing phantom)
+          exitOnResourceError: true
+        },
         files: [
             'test/**/*.spec.js'
         ],
@@ -13,22 +33,18 @@ module.exports = config => {
         },
         reporters: ['progress', 'coverage'],
         coverageReporter: {
-            reporters: [{
-                type:'text-summary'
-            }, {
-                type: 'html',
-                dir: 'test/coverage'
-            }, {
-                type: 'cobertura',
-                subdir: '.',
-                dir: 'test/coverage'
-            }]
+            reporters: [
+                // generates ./coverage/lcov.info
+                {type:'lcovonly', subdir: '.'},
+                // generates ./coverage/coverage-final.json
+                {type:'json', subdir: '.'},
+            ]
         },
         plugins: [
             'karma-jasmine',
             'karma-coverage',
             'karma-verbose-reporter',
-            'karma-chrome-launcher',
+            'karma-phantomjs-launcher',
             'karma-webpack'
         ],
         port: 9876,
