@@ -1,7 +1,7 @@
 /**
  * create by Jocs 2016.09.19
  */
-const PENDING = 'PENDING' // Promise 的 初始状态
+const PENDING = 'PENDING' // Promise 的初始状态
 const FULFILLED = 'FULFILLED' // Promise 成功返回后的状态
 const REJECTED = 'REJECTED' // Promise 失败后的状态
 

@@ -6,6 +6,6 @@ cache:
     - node_modules
 script:
   - npm test
-  - cat ./test/coverage/lcov.info | node_modules/codecov/bin/codecov
+  - cat ./coverage/lcov.info | node_modules/codecov/bin/codecov
 
   

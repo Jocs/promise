@@ -34,9 +34,9 @@ describe('APromise basic use when reject', () => {
 		})
 
 		promise
-		.then()
 		.catch(err => {
 			value = err
+			done()
 		})
 	})
 	it('should test the use when reject', done => {
