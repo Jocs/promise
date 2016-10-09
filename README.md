@@ -71,7 +71,7 @@ function resolveProvider(promise, data) {
 }
 function rejectProvider(promise, data) {
 	if (promise.status !== PENDING) return false
-	promise.status = FULFILLED
+	promise.status = REJECTED
 }
 ```
 
@@ -150,6 +150,7 @@ class Promise {
 			}
 			case REJECTED: {
 				args[1](this.result)
+                  break
 			}
 		}
 	}
@@ -177,7 +178,7 @@ Promise需要实现链式调用，我们需要再次回顾下then方法的定义
 
 > then方法为pormise添加成功和失败的处理函数，同时then方法返回一个新的promise对象，这个新的promise对象resolve处理函数的返回值，或者当没有提供处理函数时直接resolve原始的值。
 
-可以看出，promise能够链式调用归功于then方法返回一个全新的promise，并且resolve处理函数的返回值，当然，如果then方法的处理函数本身就返回一个promise，那么久不用我们自己手动生成一个promise了。了解了这些，就开始动手写代码了。
+可以看出，promise能够链式调用归功于then方法返回一个全新的promise，并且resolve处理函数的返回值，当然，如果then方法的处理函数本身就返回一个promise，那么就不用我们自己手动生成一个promise了。了解了这些，就开始动手写代码了。
 
 ```javascript
 const isPromise = object => object && object.then && typeof object.then === 'function'

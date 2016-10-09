@@ -1,6 +1,6 @@
 module.exports = config => {
     config.set({
-        basePath: __dirname,
+        basePath: '',
         singleRun: true,
         frameworks: ['jasmine'],
         browsers: ['PhantomJS', 'PhantomJS_custom'],
@@ -25,20 +25,19 @@ module.exports = config => {
           exitOnResourceError: true
         },
         files: [
-            'test/**/*.spec.js'
+            'test/test.spec.js',
+            'src/index.js'
         ],
         preprocessors: {
-            'test/**/*.spec.js': ['webpack'],
-            'src/index.js': 'coverage'
+            'test/test.spec.js': ['webpack'],
+            'src/index.js': ['webpack']
         },
         reporters: ['progress', 'coverage'],
         coverageReporter: {
             reporters: [
                 // generates ./coverage/lcov.info
-                {type:'lcovonly', subdir: '.'},
-                // generates ./coverage/coverage-final.json
-                {type:'json', subdir: '.'},
-                {type: 'text-summary', subdir: '.'}
+                {type:'lcov', dir: './test/coverage/', subdir: '.'},
+                {type: 'text-summary', dir: './test/coverage/' , subdir: '.'}
             ]
         },
         plugins: [

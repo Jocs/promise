@@ -73,6 +73,7 @@ class APromise {
 		}
 		return child
 	}
+	
 	catch(arg) {
 		return this.then(undefined, arg)
 	}
@@ -100,6 +101,7 @@ APromise.all = promises => {
 	})
 	return result
 }
+
 APromise.race = promises => {
 	const result = new APromise(noop)
 	promises.forEach((p, i) => {
