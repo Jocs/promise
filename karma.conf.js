@@ -50,11 +50,10 @@ module.exports = config => {
         port: 9876,
         webpack: {
             resolve: {
-                extensions: ['', '.js'],
-                modulesDirectories: ['node_modules', 'src']
+                extensions: ['.js']
             },
             module: {
-                loaders: [{
+                rules: [{
                     test: /\.js$/,
                     loader: 'babel-loader'
                 }]

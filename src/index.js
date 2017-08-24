@@ -1,5 +1,5 @@
 /**
- * create by Jocs 2016.09.19
+ * 2016.09.19
  */
 const PENDING = 'PENDING' // Promise 的初始状态
 const FULFILLED = 'FULFILLED' // Promise 成功返回后的状态
@@ -21,7 +21,7 @@ const statusProvider = (promise, status) => data => {
 class APromise {
 	constructor(executor) {
 		if (typeof executor !== 'function') {
-			throw new TypeError('Promise constructor need a function as parameter')
+			throw new TypeError(`Promise resolver ${executor.toString()} is not a function`)
 		}
 		this.status = PENDING
 		this.listeners = {
@@ -73,7 +73,7 @@ class APromise {
 		}
 		return child
 	}
-	
+
 	catch(arg) {
 		return this.then(undefined, arg)
 	}
