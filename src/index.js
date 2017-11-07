@@ -45,7 +45,15 @@ class APromise {
 				try {
 					const result = fn(data)
 					if (isThenable(result)) {
-						isPromise(result) ? Object.assign(child, result) : Object.assign(child, new this.constructor(result.then))
+						const successHandler = child.listeners.FULFILLED[0]
+						const errorHandler = child.listeners.REJECTED[0]
+						if (isPromise(result)) {
+							result
+							.then(successHandler, errorHandler)
+						} else {
+							new this.constructor(result.then)
+							.then(successHandler, errorHandler)
+						}
 					} else {
 						statusProvider(child, FULFILLED)(result)
 					}

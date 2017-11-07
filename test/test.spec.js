@@ -45,6 +45,32 @@ describe('APromise basic use when reject', () => {
 	})
 })
 
+describe('chain in promise', () => {
+	let value
+	let promise
+	beforeEach(done => {
+		promise = new APromise((resolve, reject) => {
+			setTimeout(() => {
+				reject(5)
+			}, 1000)
+		})
+
+		promise
+		.then(res => {
+			return new APromise(resolve => {
+				resolve(res + 1)
+			})
+		})
+		.then(res => {
+			value = res
+		})
+	})
+	it('should test promise in then method', done => {
+		expect(value).toBe(6)
+		done()
+	})
+})
+
 
 
 
