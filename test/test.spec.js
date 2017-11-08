@@ -51,7 +51,7 @@ describe('chain in promise', () => {
 	beforeEach(done => {
 		promise = new APromise((resolve, reject) => {
 			setTimeout(() => {
-				reject(5)
+				resolve(5)
 			}, 1000)
 		})
 
@@ -63,6 +63,7 @@ describe('chain in promise', () => {
 		})
 		.then(res => {
 			value = res
+			done()
 		})
 	})
 	it('should test promise in then method', done => {
